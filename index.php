@@ -1,6 +1,25 @@
 <?php
-$imgs = array("img/file2.png", "img/file0.png", "img/file1.png");
-$imgnum =2;
+function color($color)
+{
+    if ($color[0] == '#')
+        $color = substr($color, 1);
+
+    if (strlen($color) == 6)
+        list($r, $g, $b) = array($color[0].$color[1],
+            $color[2].$color[3],
+            $color[4].$color[5]);
+    elseif (strlen($color) == 3)
+        list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
+    else
+        return false;
+
+    $r = hexdec($r); $g = hexdec($g); $b = hexdec($b);
+
+    return array($r, $g, $b);
+}
+
+$imgs = array("img/file2.png", "img/file0.png", "img/file1.png","img/test.png","img/jpg.jpg");
+$imgnum =4;
 if(isset($_GET["img"])){
     $imgnum =$_GET["img"];
 }
@@ -28,23 +47,27 @@ $name_font_y = 500;
 if(isset($_GET["name_y"])){
     $name_font_y =$_GET["name_y"];
 }
-$name_font_color_r = 255;
-if(isset($_GET["name_r"])){
-    $name_font_color_r =$_GET["name_r"];
-}
-$name_font_color_g = 100;
-if(isset($_GET["name_g"])){
-    $name_font_color_g =$_GET["name_g"];
-}
-$name_font_color_b = 255;
-if(isset($_GET["name_b"])){
-    $name_font_color_b =$_GET["name_b"];
+
+$name_color = 'ff0000';
+if(isset($_GET["name_color"])){
+    $name_color =$_GET["name_color"];
 }
 
-
-$time = "03/25/2020";
+$hours = 0;
+$minute = 0;
+$seconds = 0;
+$time = "03/20/2020 16:23:56";
+if(isset($_GET["hours"])){
+    $time =$_GET["hours"];
+}
+if(isset($_GET["minute"])){
+    $time =$_GET["minute"];
+}
+if(isset($_GET["seconds"])){
+    $time =$_GET["seconds"];
+}
 if(isset($_GET["date"])){
-    $time =$_GET["date"];
+    $time =$_GET["date"].' '.$hours.':'.$minute.':'.$seconds;
 }
 $time_font = 'DIGITALDREAM';
 if(isset($_GET["date_font"])){
@@ -66,51 +89,66 @@ $time_font_y = 70;
 if(isset($_GET["date_y"])){
     $time_font_y =$_GET["date_y"];
 }
-$time_font_color_r = 255;
-if(isset($_GET["date_r"])){
-    $time_font_color_r =$_GET["date_r"];
+$time_color = '00ff00';
+if(isset($_GET["date_color"])){
+    $time_color =$_GET["date_color"];
 }
-$time_font_color_g = 100;
-if(isset($_GET["date_g"])){
-    $time_font_color_g =$_GET["date_g"];
-}
-$time_font_color_b = 255;
-if(isset($_GET["date_b"])){
-    $time_font_color_b =$_GET["date_b"];
-}
-
 $timezone ='Asia/Dhaka';
 if(isset($_GET["timezone"])){
     $timezone =$_GET["timezone"];
 }
-/*if(isset($_GET["name"])){
-    $name =$_GET["name"];
-    $name_font_size = $_GET["name_size"];
-    $name_font_angle = $_GET["name_angle"];
-    $name_font_x = $_GET["name_x"];
-    $name_font_y = $_GET["name_y"];
-    $name_font_color_r = $_GET["name_r"];
-    $name_font_color_g = $_GET["name_g"];
-    $name_font_color_b = $_GET["name_b"];
-}*/
+$bg_color ='ff0000';
+if(isset($_GET["bg_color"])){
+    $bg_color =$_GET["bg_color"];
+}
+
 date_default_timezone_set($timezone);
 include 'GIFEncoder.class.php';
 
-$name_image = imagecreatefrompng($imgs[$imgnum]);
+/*
+$ext = end(explode('.', $imgs[$imgnum]));
+$ext = strtolower($ext);*/
+$ext = pathinfo($imgs[$imgnum], PATHINFO_EXTENSION);
+$ext = strtolower($ext);
+
+if($ext == 'png'){
+    $ing_size = getimagesize($imgs[$imgnum]);
+    $canva = imagecreate($ing_size[0],$ing_size[1]);
+    imagecolorallocate($canva, color($bg_color)[0], color($bg_color)[1], color($bg_color)[2]); //png backgound r g b color
+    imagejpeg($canva, 'temp/new.jpg');
+    $bg_canvas = imagecreatefromjpeg('temp/new.jpg');
+    $name_image = imagecreatefrompng($imgs[$imgnum]);
+
+     imagecopy($bg_canvas, $name_image, 0, 0, 0, 0, $ing_size[0], $ing_size[1]);
 
 
-$name_font = array(
-    'size'=>$name_font_size,
-    'angle'=>$name_font_angle,
-    'x-offset'=>$name_font_x,
-    'y-offset'=>$name_font_y,
-    'file'=> __DIR__.'/font/'.$name_font.'.ttf',
-    'color'=>imagecolorallocate($name_image, $name_font_color_r, $name_font_color_g, $name_font_color_b),
-);
-imagettftext ($name_image , $name_font['size'] , $name_font['angle'] , $name_font['x-offset'] , $name_font['y-offset'] , $name_font['color'] , $name_font['file'], $name );
-imagepng($name_image, 'temp/new.png');
+    $name_font = array(
+        'size'=>$name_font_size,
+        'angle'=>$name_font_angle,
+        'x-offset'=>$name_font_x,
+        'y-offset'=>$name_font_y,
+        'file'=> __DIR__.'/font/'.$name_font.'.ttf',
+        'color'=>imagecolorallocate($bg_canvas, color($name_color)[0], color($name_color)[1], color($name_color)[2]),
+    );
+    imagettftext ($bg_canvas , $name_font['size'] , $name_font['angle'] , $name_font['x-offset'] , $name_font['y-offset'] , $name_font['color'] , $name_font['file'], $name );
+    imagepng($bg_canvas, 'temp/new.png');
+}
 
-$time = "03/20/2020";
+else if($ext == 'jpg'){
+    $name_image = imagecreatefromjpeg($imgs[$imgnum]);
+    $name_font = array(
+        'size'=>$name_font_size,
+        'angle'=>$name_font_angle,
+        'x-offset'=>$name_font_x,
+        'y-offset'=>$name_font_y,
+        'file'=> __DIR__.'/font/'.$name_font.'.ttf',
+        'color'=>imagecolorallocate($name_image, color($name_color)[0], color($name_color)[1], color($name_color)[2]),
+    );
+    imagettftext ($name_image , $name_font['size'] , $name_font['angle'] , $name_font['x-offset'] , $name_font['y-offset'] , $name_font['color'] , $name_font['file'], $name );
+    imagepng($name_image, 'temp/new.png');
+
+}
+
 
 $future_date = new DateTime(date('r',strtotime($time)));
 $time_now = time();
@@ -129,7 +167,7 @@ $font = array(
 	'x-offset'=>$time_font_x,
 	'y-offset'=>$time_font_y,
     'file'=> __DIR__.'/font/'.$time_font.'.ttf',
-	'color'=>imagecolorallocate($image, $time_font_color_r,$time_font_color_g,$time_font_color_b),
+	'color'=>imagecolorallocate($image, color($time_color)[0],color($time_color)[1],color($time_color)[2]),
 );
 for($i = 0; $i <= 60; $i++){
 	$interval = date_diff($future_date, $now);
@@ -149,7 +187,14 @@ for($i = 0; $i <= 60; $i++){
 	} else {
 		// Open the first source image and add the text.
         $image = imagecreatefrompng('temp/new.png');
-		$text = $interval->format('%a:%H:%I:%S');
+        $day = $interval->format('%a');
+        if($day == 0 )
+        {
+            $text = $interval->format('%H:%I:%S');
+        }
+        else {
+            $text = $interval->format('%a:%H:%I:%S');
+        }
 		// %a is weird in that it doesn’t give you a two digit number
 		// check if it starts with a single digit 0-9
 		// and prepend a 0 if it does
@@ -167,13 +212,11 @@ for($i = 0; $i <= 60; $i++){
 	$now->modify('+1 second');
 }
 //expire this image instantly
-header( 'Expires: Sat, 26 Jul 2050 05:00:00 GMT' );
-header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-header( 'Cache-Control: post-check=0, pre-check=0', false );
-header( 'Pragma: no-cache' ); 
+
 $gif = new AnimatedGif($frames,$delays,$loops);
 $gif->getAnimation();
 $gif->display();
-$temp_file = 'temp/new.png';
-unlink($temp_file);
+$temp_png = 'temp/new.png';
+unlink($temp_png);
+$temp_jpg = 'temp/new.jpg';
+unlink($temp_jpg);
