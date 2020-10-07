@@ -1,29 +1,5 @@
 <?php
- 
-/*
-  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-  :: Formerly known as:::
-  :: GIFEncoder Version 2.0 by László Zsidi, http://gifs.hu
-  ::
-  :: This class is a rewritten 'GifMerge.class.php' version.
-  ::
-  :: Modification:
-  :: - Simplified and easy code,
-  :: - Ultra fast encoding,
-  :: - Built-in errors,
-  :: - Stable working
-  ::
-  ::
-  :: Updated at 2007. 02. 13. '00.05.AM'
-  ::
-  ::
-  ::
-  :: Try on-line GIFBuilder Form demo based on GIFEncoder.
-  ::
-  :: http://gifs.hu/phpclasses/demos/GifBuilder/
-  ::
-  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
- */
+
  
 /**
  * Encode animated gifs
